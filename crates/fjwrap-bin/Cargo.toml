@@ -1,0 +1,21 @@
+[package]
+name = "fjwrap-bin"
+version.workspace = true
+edition.workspace = true
+description = "Fjwrap binary runner"
+
+[[bin]]
+name = "fjwrap"
+path = "src/main.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+
+# Smol ecosystem
+smol = { workspace = true }
+async-channel = { workspace = true }
+async-net = { workspace = true }
+futures-lite = { workspace = true }

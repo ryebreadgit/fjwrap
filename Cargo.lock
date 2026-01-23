@@ -671,6 +671,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "fjwrap-bin"
+version = "0.1.0"
+dependencies = [
+ "async-channel",
+ "async-net",
+ "async-trait",
+ "futures-lite",
+ "serde",
+ "serde_json",
+ "smol",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "fjwrap-client"
 version = "0.1.0"
 dependencies = [
@@ -688,10 +702,12 @@ dependencies = [
 name = "fjwrap-core"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
+ "blocking",
  "fjall",
  "serde",
+ "serde_json",
  "thiserror 2.0.18",
- "tracing",
 ]
 
 [[package]]

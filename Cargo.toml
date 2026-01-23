@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "crates/fjwrap",
+    "crates/fjwrap-bin",
     "crates/fjwrap-core",
     "crates/fjwrap-distributed",
     "crates/fjwrap-client",
@@ -41,3 +42,4 @@ async-channel = "2"
 async-lock = "3"
 async-net = "2"
 futures-lite = "2"
+blocking = "1.6"
