@@ -1,4 +1,4 @@
-use fjwrap_core::{Error as CoreError, KvStore};
+use fjwrap_core::{Error, KvStore};
 use fjwrap_proto::{
     DeleteRequest, DeleteResponse, GetRequest, GetResponse, SetRequest, SetResponse,
     kv_service_server::KvService,
@@ -17,14 +17,14 @@ impl<S> KvServiceImpl<S> {
     }
 }
 
-fn core_error_to_status(err: CoreError) -> Status {
+fn core_error_to_status(err: Error) -> Status {
     match err {
-        CoreError::KeyNotFound => Status::not_found("key not found"),
-        CoreError::Storage(e) => Status::internal(format!("storage error: {}", e)),
-        CoreError::Io(e) => Status::internal(format!("io error: {}", e)),
-        CoreError::SerdeJson(e) => Status::internal(format!("serialization error: {}", e)),
-        CoreError::Network(e) => Status::internal(format!("network error: {}", e)),
-        CoreError::Other(msg) => Status::internal(msg),
+        Error::KeyNotFound => Status::not_found("key not found"),
+        Error::Storage(e) => Status::internal(format!("storage error: {}", e)),
+        Error::Io(e) => Status::internal(format!("io error: {}", e)),
+        Error::SerdeJson(e) => Status::internal(format!("serialization error: {}", e)),
+        Error::Network(e) => Status::internal(format!("network error: {}", e)),
+        Error::Other(msg) => Status::internal(msg),
     }
 }
 
