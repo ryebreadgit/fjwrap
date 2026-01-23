@@ -9,8 +9,7 @@ name = "fjwrap"
 path = "src/main.rs"
 
 [dependencies]
-fjwrap-core = { path = "../fjwrap-core" }
-fjwrap-distributed = { path = "../fjwrap-distributed" }
+fjwrap = { path = "../fjwrap", features = ["distributed"] }
 clap = { workspace = true }
 tokio = { workspace = true }
 anyhow = { workspace = true }

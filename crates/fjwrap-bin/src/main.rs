@@ -1,7 +1,6 @@
 use anyhow::Error;
 use clap::Parser;
-use fjwrap_core::{LocalConfig, LocalStore};
-use fjwrap_distributed::run_server;
+use fjwrap::{LocalConfig, LocalStore, run_server};
 use std::net::SocketAddr;
 use std::sync::Arc;
 

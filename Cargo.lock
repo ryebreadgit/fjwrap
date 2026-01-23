@@ -393,8 +393,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
- "fjwrap-core",
- "fjwrap-distributed",
+ "fjwrap",
  "tokio",
 ]
 
