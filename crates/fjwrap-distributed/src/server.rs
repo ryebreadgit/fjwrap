@@ -6,7 +6,6 @@ use fjwrap_proto::{
 use std::sync::Arc;
 use tonic::{Request, Response, Status};
 
-/// gRPC service implementation wrapping any KvStore
 pub struct KvServiceImpl<S> {
     db: Arc<S>,
 }

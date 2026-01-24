@@ -429,6 +429,8 @@ dependencies = [
  "fjwrap-core",
  "fjwrap-proto",
  "prost",
+ "serde",
+ "serde_json",
  "tokio",
  "tonic",
  "tracing",
@@ -439,6 +441,7 @@ name = "fjwrap-proto"
 version = "0.1.0"
 dependencies = [
  "prost",
+ "serde",
  "tonic",
  "tonic-prost",
  "tonic-prost-build",

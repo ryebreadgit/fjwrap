@@ -1,3 +1,4 @@
+mod routing;
 mod server;
 
 use fjwrap_core::KvStore;
@@ -5,6 +6,7 @@ use fjwrap_proto::kv_service_server::KvServiceServer;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+pub use routing::StaticRouter;
 pub use server::KvServiceImpl;
 
 pub async fn run_server<S>(store: Arc<S>, addr: SocketAddr) -> Result<(), tonic::transport::Error>
