@@ -1,10 +1,32 @@
 syntax = "proto3";
 package fjwrap;
 
+/// Service for key-value store operations.
 service KvService {
+    // Get value for a given key in a partition
     rpc Get(GetRequest) returns (GetResponse);
+    // Set value for a given key in a partition
     rpc Set(SetRequest) returns (SetResponse);
+    // Delete a given key in a partition
     rpc Delete(DeleteRequest) returns (DeleteResponse);
+}
+
+// Service for cluster management and configuration.
+service ClusterService {
+    // Get the current cluster topology
+    rpc GetTopology(GetTopologyRequest) returns (GetTopologyResponse);
+    // Watch for changes in the cluster topology
+    rpc WatchTopology(WatchTopologyRequest) returns (stream ClusterConfig);
+}
+
+// Service for Raft consensus operations.
+service RaftService {
+    // Append entries to the Raft log
+    rpc AppendEntries(AppendEntriesRequest) returns (AppendEntriesResponse);
+    // Request vote for leader election
+    rpc RequestVote(RequestVoteRequest) returns (RequestVoteResponse);
+    // Install a snapshot for state machine
+    rpc InstallSnapshot(InstallSnapshotRequest) returns (InstallSnapshotResponse);
 }
 
 message GetRequest {
@@ -31,11 +53,64 @@ message DeleteRequest {
 
 message DeleteResponse {}
 
-service RaftService {
-    rpc AppendEntries(AppendEntriesRequest) returns (AppendEntriesResponse);
-    rpc RequestVote(RequestVoteRequest) returns (RequestVoteResponse);
-    rpc InstallSnapshot(InstallSnapshotRequest) returns (InstallSnapshotResponse);
+// Cluster Service
+
+message NodeId {
+    uint64 id = 1;
 }
+
+message ShardId {
+    uint64 id = 1;
+}
+
+message NodeAddress {
+    string host = 1;
+    uint32 port = 2;
+}
+
+message NodeInfo {
+    NodeId id = 1;
+    NodeAddress address = 2;
+}
+
+enum ShardStatus {
+    SHARD_STATUS_UNKNOWN = 0;
+    SHARD_STATUS_ACTIVE = 1;
+    SHARD_STATUS_PROVISIONING = 2;
+    SHARD_STATUS_SPLITTING = 3;
+    SHARD_STATUS_DRAINING = 4;
+    SHARD_STATUS_OFFLINE = 5;
+}
+
+message KeyRange {
+    optional bytes start = 1;
+    optional bytes end = 2;
+}
+
+message ShardConfig {
+    ShardId id = 1;
+    KeyRange range = 2;
+    repeated NodeId replicas = 3;
+    ShardStatus status = 4;
+    optional NodeId leader = 5;
+}
+
+message ClusterConfig {
+    uint64 version = 1;
+    repeated NodeInfo nodes = 2;
+    repeated ShardConfig shards = 3;
+}
+
+message GetTopologyRequest {}
+message GetTopologyResponse {
+    ClusterConfig config = 1;
+}
+
+message WatchTopologyRequest {
+    uint64 known_version = 1;
+}
+
+// Raft Service
 
 message AppendEntriesRequest {}
 message AppendEntriesResponse {}
