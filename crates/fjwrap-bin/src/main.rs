@@ -12,6 +12,9 @@ struct Args {
     #[arg(long, default_value = "0.0.0.0:50051", env = "FJWRAP_LISTEN_ADDR")]
     listen: SocketAddr,
 
+    #[arg(long, default_value = "0", env = "FJWRAP_NODE_ID")]
+    node_id: u64,
+
     #[arg(long, default_value = ".fjwrap_data", env = "FJWRAP_DATA_PATH")]
     data_path: String,
 
@@ -24,11 +27,24 @@ struct Args {
         env = "FJWRAP_ROUTER_CONFIG_PATH"
     )]
     router_config_path: String,
+
+    #[arg(long, default_value = "false", env = "FJWRAP_VERBOSE")]
+    verbose: bool,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let args = Args::parse();
+
+    if args.verbose {
+        tracing_subscriber::fmt()
+            .with_max_level(tracing::Level::DEBUG)
+            .init();
+    } else {
+        tracing_subscriber::fmt()
+            .with_max_level(tracing::Level::WARN)
+            .init();
+    }
 
     if !fs::metadata(&args.router_config_path).is_ok() {
         let mut formatter = Formatter::new();
@@ -84,7 +100,7 @@ async fn main() -> Result<(), Error> {
     let router = Arc::new(router_config);
 
     println!("Starting server on {}", args.listen);
-    run_server(store, router, 0, args.listen).await?;
+    run_server(store, router, args.node_id, args.listen).await?;
 
     Ok(())
 }
