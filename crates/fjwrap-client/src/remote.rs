@@ -37,23 +37,27 @@ impl RemoteStore {
         })
     }
 
-    pub fn connect_lazy(config: RemoteConfig) -> Result<Self> {
-        let mut endpoint: Endpoint = Endpoint::from_shared(config.endpoint)
-            .map_err(|e| Error::Other(format!("invalid endpoint: {}", e)))?;
+    pub async fn connect_lazy(config: RemoteConfig) -> Result<Self> {
+        async {
+            let mut endpoint: Endpoint = Endpoint::from_shared(config.endpoint)
+                .map_err(|e| Error::Other(format!("invalid endpoint: {}", e)))?;
 
-        if let Some(timeout) = config.connect_timeout {
-            endpoint = endpoint.connect_timeout(timeout);
+            if let Some(timeout) = config.connect_timeout {
+                endpoint = endpoint.connect_timeout(timeout);
+            }
+
+            if let Some(timeout) = config.request_timeout {
+                endpoint = endpoint.timeout(timeout);
+            }
+
+            let channel = endpoint.connect_lazy();
+
+            Ok(Self {
+                client: KvServiceClient::new(channel),
+            })
         }
-
-        if let Some(timeout) = config.request_timeout {
-            endpoint = endpoint.timeout(timeout);
-        }
-
-        let channel = endpoint.connect_lazy();
-
-        Ok(Self {
-            client: KvServiceClient::new(channel),
-        })
+        .compat()
+        .await
     }
 }
 
