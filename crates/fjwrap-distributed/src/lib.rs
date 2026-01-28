@@ -2,10 +2,13 @@ mod routing;
 mod server;
 
 use fjwrap_core::KvStore;
-use fjwrap_proto::{NodeId, kv_service_server::KvServiceServer};
+use fjwrap_proto::kv_service_server::KvServiceServer;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+pub use fjwrap_proto::{
+    KeyRange, NodeAddress, NodeId, NodeInfo, ShardConfig, ShardId, ShardStatus,
+};
 pub use routing::{ClusterConfig, ShardRouter, StaticRouter};
 pub use server::server::KvServiceImpl;
 
