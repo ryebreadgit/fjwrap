@@ -1,4 +1,5 @@
 use crate::config::RemoteConfig;
+use async_compat::CompatExt;
 use async_trait::async_trait;
 use fjwrap_core::{Error, KvStore, Result};
 use fjwrap_proto::{DeleteRequest, GetRequest, SetRequest, kv_service_client::KvServiceClient};
@@ -27,6 +28,7 @@ impl RemoteStore {
 
         let channel = endpoint
             .connect()
+            .compat()
             .await
             .map_err(|e| Error::Other(format!("connection failed: {}", e)))?;
 
@@ -63,7 +65,11 @@ impl KvStore for RemoteStore {
             key: key.to_vec(),
         };
         let mut client = self.client.clone();
-        let response = client.get(request).await.map_err(status_to_core_error)?;
+        let response = client
+            .get(request)
+            .compat()
+            .await
+            .map_err(status_to_core_error)?;
         Ok(response.into_inner().value)
     }
 
@@ -74,7 +80,11 @@ impl KvStore for RemoteStore {
             value: value.to_vec(),
         };
         let mut client = self.client.clone();
-        client.set(request).await.map_err(status_to_core_error)?;
+        client
+            .set(request)
+            .compat()
+            .await
+            .map_err(status_to_core_error)?;
         Ok(())
     }
 
@@ -84,7 +94,11 @@ impl KvStore for RemoteStore {
             key: key.to_vec(),
         };
         let mut client = self.client.clone();
-        client.delete(request).await.map_err(status_to_core_error)?;
+        client
+            .delete(request)
+            .compat()
+            .await
+            .map_err(status_to_core_error)?;
         Ok(())
     }
 }
