@@ -46,8 +46,8 @@ async fn main() -> Result<(), Error> {
             shards: vec![ShardConfig {
                 id: Some(ShardId { id: 0 }),
                 range: Some(KeyRange {
-                    start: Some(vec![0x00]),
-                    end: Some(vec![0xFF]),
+                    start: None,
+                    end: Some(vec![0xFF, 0xFF, 0xFF, 0xFF]),
                 }),
                 replicas: vec![NodeId { id: 0 }],
                 status: ShardStatus::Active.into(),
@@ -55,8 +55,11 @@ async fn main() -> Result<(), Error> {
             }],
         };
         let json_str = formatter.serialize(&default_config, 0, 100)?;
-        fs::write("./router_settings.json", json_str)?;
-        println!("Default router config written to './router_settings.json'");
+        fs::write(&args.router_config_path, json_str)?;
+        println!(
+            "Default router config written to '{}'",
+            &args.router_config_path
+        );
     }
 
     let config = LocalConfig {
