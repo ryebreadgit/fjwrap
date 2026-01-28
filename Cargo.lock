@@ -407,6 +407,8 @@ dependencies = [
  "anyhow",
  "clap",
  "fjwrap",
+ "fracturedjson",
+ "serde_json",
  "tokio",
 ]
 
@@ -481,6 +483,17 @@ name = "foldhash"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
+
+[[package]]
+name = "fracturedjson"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "626fdb90914ddb2417e9d53d0e97600b9aa81f8dd6c1f8d8c792e03ecafa399d"
+dependencies = [
+ "clap",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "futures-channel"

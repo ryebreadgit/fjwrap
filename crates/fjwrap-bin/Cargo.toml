@@ -13,3 +13,5 @@ fjwrap = { path = "../fjwrap", features = ["distributed"] }
 clap = { workspace = true }
 tokio = { workspace = true }
 anyhow = { workspace = true }
+serde_json = { workspace = true }
+fracturedjson = { workspace = true }

@@ -14,6 +14,7 @@ devenv.local.yaml
 
 /target
 
-# Ignore default config path
+# Ignore default data path & router settings
 
 .fjwrap_data/
+router_settings.json

@@ -1,8 +1,11 @@
 use anyhow::Error;
 use clap::Parser;
-use fjwrap::{LocalConfig, LocalStore, StaticRouter, run_server};
-use std::net::SocketAddr;
-use std::sync::Arc;
+use fjwrap::{
+    ClusterConfig, KeyRange, LocalConfig, LocalStore, NodeAddress, NodeId, NodeInfo, ShardConfig,
+    ShardId, ShardStatus, StaticRouter, run_server,
+};
+use fracturedjson::Formatter;
+use std::{fs, net::SocketAddr, sync::Arc};
 
 #[derive(Parser)]
 struct Args {
@@ -14,11 +17,53 @@ struct Args {
 
     #[arg(long, default_value = "67108864", env = "FJWRAP_CACHE_SIZE")] // 64 MiB
     cache_size: u64,
+
+    #[arg(
+        long,
+        default_value = "./router_settings.json",
+        env = "FJWRAP_ROUTER_CONFIG_PATH"
+    )]
+    router_config_path: String,
+
+    #[arg(long, default_value = "false")]
+    generate_default_config: bool,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let args = Args::parse();
+
+    if args.generate_default_config {
+        if fs::metadata("./router_settings.json").is_ok() {
+            println!("'./router_settings.json' already exists, not overwriting");
+            return Ok(());
+        }
+        let mut formatter = Formatter::new();
+        let default_config = ClusterConfig {
+            version: 1,
+            nodes: vec![NodeInfo {
+                id: Some(NodeId { id: 0 }),
+                address: Some(NodeAddress {
+                    host: args.listen.ip().to_string(),
+                    port: args.listen.port().into(),
+                }),
+            }],
+            shards: vec![ShardConfig {
+                id: Some(ShardId { id: 0 }),
+                range: Some(KeyRange {
+                    start: Some(vec![0x00]),
+                    end: Some(vec![0xFF]),
+                }),
+                replicas: vec![NodeId { id: 0 }],
+                status: ShardStatus::Active.into(),
+                leader: Some(NodeId { id: 0 }),
+            }],
+        };
+        let json_str = formatter.serialize(&default_config, 0, 100)?;
+        fs::write("./router_settings.json", json_str)?;
+        println!("Default router config written to './router_settings.json'");
+        return Ok(());
+    }
 
     let config = LocalConfig {
         path: args.data_path,
@@ -27,11 +72,23 @@ async fn main() -> Result<(), Error> {
 
     let store = Arc::new(LocalStore::new(config)?);
 
-    let router = Arc::new(StaticRouter::single_node(
-        0,
-        args.listen.ip().to_string(),
-        args.listen.port().into(),
-    ));
+    let router_config_str = if fs::metadata(&args.router_config_path).is_ok() {
+        fs::read_to_string(&args.router_config_path)?
+    } else {
+        println!(
+            "Router config file '{}' not found, using single-node config",
+            args.router_config_path
+        );
+        String::new()
+    };
+
+    let router_config = if router_config_str.is_empty() {
+        StaticRouter::single_node(0, args.listen.ip().to_string(), args.listen.port().into())
+    } else {
+        StaticRouter::from_json_str(&router_config_str)?
+    };
+
+    let router = Arc::new(router_config);
 
     println!("Starting server on {}", args.listen);
     run_server(store, router, 0, args.listen).await?;
