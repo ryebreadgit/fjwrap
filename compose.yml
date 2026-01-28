@@ -1,8 +1,0 @@
-services:
-  server:
-    image: fjwrap-server:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "50051:50051"
