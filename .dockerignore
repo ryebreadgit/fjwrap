@@ -1,0 +1,23 @@
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
+
+# Added by cargo
+
+/target
+
+# Ignore default data path & router settings
+
+.fjwrap_data/
+router_settings.json
+
+# Ignore IDE files
+.vscode/
