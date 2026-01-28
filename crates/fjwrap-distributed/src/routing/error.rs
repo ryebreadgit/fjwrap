@@ -33,6 +33,7 @@ pub enum RouteError {
     NoShardForKey,
     ShardNotFound(ShardId),
     ShardUnavailable(ShardId),
+    ShardRangeNotDefined(ShardId),
     NoNodesAvailable(ShardId),
 }
 
@@ -43,6 +44,9 @@ impl fmt::Display for RouteError {
             RouteError::ShardNotFound(shard_id) => write!(f, "shard not found: {:?}", shard_id),
             RouteError::ShardUnavailable(shard_id) => {
                 write!(f, "shard unavailable: {:?}", shard_id)
+            }
+            RouteError::ShardRangeNotDefined(shard_id) => {
+                write!(f, "shard range not defined for shard: {:?}", shard_id)
             }
             RouteError::NoNodesAvailable(shard_id) => {
                 write!(f, "no nodes available for shard: {:?}", shard_id)

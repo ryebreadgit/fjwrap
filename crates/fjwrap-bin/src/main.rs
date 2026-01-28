@@ -1,6 +1,6 @@
 use anyhow::Error;
 use clap::Parser;
-use fjwrap::{LocalConfig, LocalStore, run_server};
+use fjwrap::{LocalConfig, LocalStore, StaticRouter, run_server};
 use std::net::SocketAddr;
 use std::sync::Arc;
 
@@ -27,8 +27,14 @@ async fn main() -> Result<(), Error> {
 
     let store = Arc::new(LocalStore::new(config)?);
 
+    let router = Arc::new(StaticRouter::single_node(
+        0,
+        args.listen.ip().to_string(),
+        args.listen.port().into(),
+    ));
+
     println!("Starting server on {}", args.listen);
-    run_server(store, args.listen).await?;
+    run_server(store, router, 0, args.listen).await?;
 
     Ok(())
 }

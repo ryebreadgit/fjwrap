@@ -2,18 +2,25 @@ mod routing;
 mod server;
 
 use fjwrap_core::KvStore;
-use fjwrap_proto::kv_service_server::KvServiceServer;
+use fjwrap_proto::{NodeId, kv_service_server::KvServiceServer};
 use std::net::SocketAddr;
 use std::sync::Arc;
 
-pub use routing::StaticRouter;
-pub use server::KvServiceImpl;
+pub use routing::{ClusterConfig, ShardRouter, StaticRouter};
+pub use server::server::KvServiceImpl;
 
-pub async fn run_server<S>(store: Arc<S>, addr: SocketAddr) -> Result<(), tonic::transport::Error>
+pub async fn run_server<S, R>(
+    store: Arc<S>,
+    router: Arc<R>,
+    node_id: u64,
+    addr: SocketAddr,
+) -> Result<(), tonic::transport::Error>
 where
     S: KvStore + Send + Sync + 'static,
+    R: ShardRouter + Send + Sync + 'static,
 {
-    let kv_service = KvServiceImpl::new(store);
+    let node_id = NodeId { id: node_id };
+    let kv_service = KvServiceImpl::new(store, router, node_id);
 
     tracing::info!(%addr, "starting gRPC server");
 

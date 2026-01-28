@@ -27,7 +27,9 @@ pub trait ShardRouter: Send + Sync {
 
     fn route(&self, partition: &str, key: &[u8]) -> RouteResult<ShardId>;
 
-    fn shard_nodes(&self, shard_id: ShardId) -> RouteResult<Vec<String>>;
+    fn shard_nodes(&self, shard_id: ShardId) -> RouteResult<Vec<NodeInfo>>;
+
+    fn node_shard_ids(&self, node_id: &NodeId) -> RouteResult<Vec<ShardId>>;
 
     fn config_version(&self) -> RouteResult<u64>;
 }

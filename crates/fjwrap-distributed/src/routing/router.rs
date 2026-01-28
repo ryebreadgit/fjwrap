@@ -1,7 +1,7 @@
 use crate::routing::{
     error::RouteError,
     traits::{ClusterConfigExt, KeyRangeExt, RouteResult, ShardRouter},
-    types::{ClusterConfig, ShardId, ShardStatus},
+    types::{ClusterConfig, NodeId, NodeInfo, ShardId, ShardStatus},
 };
 use prost::Message;
 use std::sync::Arc;
@@ -9,20 +9,12 @@ use std::sync::Arc;
 #[derive(Clone)]
 pub struct StaticRouter {
     config: Arc<ClusterConfig>,
-    sorted_shards: Arc<Vec<ShardId>>,
 }
 
 impl StaticRouter {
     pub fn new(config: ClusterConfig) -> Self {
-        let mut sorted_shards: Vec<ShardId> = config
-            .shards
-            .iter()
-            .filter_map(|shard| shard.id.clone())
-            .collect();
-        sorted_shards.sort_by_key(|shard_id| shard_id.id);
         StaticRouter {
             config: Arc::new(config),
-            sorted_shards: Arc::new(sorted_shards),
         }
     }
 
@@ -34,6 +26,11 @@ impl StaticRouter {
     pub fn from_proto_bytes(bytes: &[u8]) -> Result<Self, prost::DecodeError> {
         let config = ClusterConfig::decode(bytes)?;
         Ok(StaticRouter::new(config))
+    }
+
+    pub fn single_node(node_id: u64, host: String, port: u32) -> Self {
+        let config = ClusterConfig::single_node(node_id, host, port);
+        StaticRouter::new(config)
     }
 }
 
@@ -54,7 +51,7 @@ impl ShardRouter for StaticRouter {
         Err(RouteError::NoShardForKey)
     }
 
-    fn shard_nodes(&self, shard_id: ShardId) -> RouteResult<Vec<String>> {
+    fn shard_nodes(&self, shard_id: ShardId) -> RouteResult<Vec<NodeInfo>> {
         let shard = self
             .config
             .get_shard(&shard_id)
@@ -62,20 +59,25 @@ impl ShardRouter for StaticRouter {
 
         let mut nodes = Vec::new();
         for node_id in &shard.replicas {
-            let node = self
-                .config
-                .get_node(node_id)
-                .ok_or(RouteError::ShardUnavailable(shard_id.clone()))?;
-            if let Some(address) = &node.address {
-                nodes.push(format!("{}:{}", address.host, address.port));
+            if let Some(node) = self.config.get_node(node_id) {
+                nodes.push(node.clone());
             }
         }
-
         if nodes.is_empty() {
             return Err(RouteError::NoNodesAvailable(shard_id));
         }
 
         Ok(nodes)
+    }
+
+    fn node_shard_ids(&self, node_id: &NodeId) -> RouteResult<Vec<ShardId>> {
+        let mut shard_ids = Vec::new();
+        for shard in &self.config.shards {
+            if shard.replicas.iter().any(|n| n == node_id) {
+                shard_ids.push(shard.id.clone().unwrap());
+            }
+        }
+        Ok(shard_ids)
     }
 
     fn config_version(&self) -> RouteResult<u64> {
