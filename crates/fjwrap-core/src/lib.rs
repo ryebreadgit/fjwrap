@@ -6,4 +6,4 @@ mod traits;
 pub use config::LocalConfig;
 pub use error::{Error, Result};
 pub use local::LocalStore;
-pub use traits::{KvStore, KvStoreExt};
+pub use traits::KvStore;
