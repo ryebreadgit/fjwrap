@@ -1,5 +1,5 @@
 pub mod proto {
-    tonic::include_proto!("fjwrap");
+    tonic::include_proto!("fjwrappb");
 }
 
 pub use proto::*;
