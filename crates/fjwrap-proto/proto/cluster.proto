@@ -1,0 +1,65 @@
+syntax = "proto3";
+package fjwrappb;
+
+// Service for cluster management and configuration.
+service ClusterService {
+    // Get the current cluster topology
+    rpc GetTopology(GetTopologyRequest) returns (GetTopologyResponse);
+    // Watch for changes in the cluster topology
+    rpc WatchTopology(WatchTopologyRequest) returns (stream ClusterConfig);
+}
+
+message NodeId {
+    uint64 id = 1;
+}
+
+message ShardId {
+    uint64 id = 1;
+}
+
+message NodeAddress {
+    string host = 1;
+    uint32 port = 2;
+}
+
+message NodeInfo {
+    NodeId id = 1;
+    NodeAddress address = 2;
+}
+
+enum ShardStatus {
+    SHARD_STATUS_UNKNOWN = 0;
+    SHARD_STATUS_ACTIVE = 1;
+    SHARD_STATUS_PROVISIONING = 2;
+    SHARD_STATUS_SPLITTING = 3;
+    SHARD_STATUS_DRAINING = 4;
+    SHARD_STATUS_OFFLINE = 5;
+}
+
+message KeyRange {
+    optional bytes begin = 1;
+    optional bytes end = 2;
+}
+
+message ShardConfig {
+    ShardId id = 1;
+    KeyRange range = 2;
+    repeated NodeId replicas = 3;
+    ShardStatus status = 4;
+    optional NodeId leader = 5;
+}
+
+message ClusterConfig {
+    uint64 version = 1;
+    repeated NodeInfo nodes = 2;
+    repeated ShardConfig shards = 3;
+}
+
+message GetTopologyRequest {}
+message GetTopologyResponse {
+    ClusterConfig config = 1;
+}
+
+message WatchTopologyRequest {
+    uint64 known_version = 1;
+}

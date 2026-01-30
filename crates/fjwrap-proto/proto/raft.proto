@@ -1,0 +1,19 @@
+syntax = "proto3";
+package fjwrappb;
+
+// Service for Raft consensus operations.
+service RaftService {
+    // Append entries to the Raft log
+    rpc AppendEntries(AppendEntriesRequest) returns (AppendEntriesResponse);
+    // Request vote for leader election
+    rpc RequestVote(RequestVoteRequest) returns (RequestVoteResponse);
+    // Install a snapshot for state machine
+    rpc InstallSnapshot(InstallSnapshotRequest) returns (InstallSnapshotResponse);
+}
+
+message AppendEntriesRequest {}
+message AppendEntriesResponse {}
+message RequestVoteRequest {}
+message RequestVoteResponse {}
+message InstallSnapshotRequest {}
+message InstallSnapshotResponse {}

@@ -1,0 +1,36 @@
+syntax = "proto3";
+package fjwrappb;
+
+/// Service for key-value store operations.
+service KvService {
+    // Get value for a given key in a partition
+    rpc Get(GetRequest) returns (GetResponse);
+    // Set value for a given key in a partition
+    rpc Set(SetRequest) returns (SetResponse);
+    // Delete a given key in a partition
+    rpc Delete(DeleteRequest) returns (DeleteResponse);
+}
+
+message GetRequest {
+    bytes partition = 1;
+    bytes key = 2;
+}
+
+message GetResponse {
+    optional bytes value = 1;
+}
+
+message SetRequest {
+    bytes partition = 1;
+    bytes key = 2;
+    bytes value = 3;
+}
+
+message SetResponse {}
+
+message DeleteRequest {
+    bytes partition = 1;
+    bytes key = 2;
+}
+
+message DeleteResponse {}
