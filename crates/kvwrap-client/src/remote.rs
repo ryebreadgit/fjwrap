@@ -1,8 +1,8 @@
 use crate::config::RemoteConfig;
 use async_compat::CompatExt;
 use async_trait::async_trait;
-use fjwrap_core::{Error, KvStore, Result};
-use fjwrap_proto::{DeleteRequest, GetRequest, SetRequest, kv_service_client::KvServiceClient};
+use kvwrap_core::{Error, KvStore, Result};
+use kvwrap_proto::{DeleteRequest, GetRequest, SetRequest, kv_service_client::KvServiceClient};
 use tonic::{
     Code, Status,
     transport::{Channel, Endpoint},

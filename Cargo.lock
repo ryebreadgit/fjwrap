@@ -392,81 +392,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fjwrap"
-version = "0.1.0"
-dependencies = [
- "fjwrap-client",
- "fjwrap-core",
- "fjwrap-distributed",
-]
-
-[[package]]
-name = "fjwrap-bin"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "fjwrap",
- "fracturedjson",
- "serde_json",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "fjwrap-client"
-version = "0.1.0"
-dependencies = [
- "async-compat",
- "async-trait",
- "fjwrap-core",
- "fjwrap-proto",
- "serde",
- "serde_json",
- "thiserror",
- "tonic",
-]
-
-[[package]]
-name = "fjwrap-core"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "base64",
- "blocking",
- "fjall",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
-name = "fjwrap-distributed"
-version = "0.1.0"
-dependencies = [
- "fjwrap-core",
- "fjwrap-proto",
- "prost",
- "serde",
- "serde_json",
- "tokio",
- "tonic",
- "tracing",
-]
-
-[[package]]
-name = "fjwrap-proto"
-version = "0.1.0"
-dependencies = [
- "prost",
- "serde",
- "tonic",
- "tonic-prost",
- "tonic-prost-build",
-]
-
-[[package]]
 name = "flume"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -752,6 +677,81 @@ name = "itoa"
 version = "1.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "92ecc6618181def0457392ccd0ee51198e065e016d1d527a7ac1b6dc7c1f09d2"
+
+[[package]]
+name = "kvwrap"
+version = "0.1.0"
+dependencies = [
+ "kvwrap-client",
+ "kvwrap-core",
+ "kvwrap-distributed",
+]
+
+[[package]]
+name = "kvwrap-bin"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "fracturedjson",
+ "kvwrap",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "kvwrap-client"
+version = "0.1.0"
+dependencies = [
+ "async-compat",
+ "async-trait",
+ "kvwrap-core",
+ "kvwrap-proto",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tonic",
+]
+
+[[package]]
+name = "kvwrap-core"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "base64",
+ "blocking",
+ "fjall",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "kvwrap-distributed"
+version = "0.1.0"
+dependencies = [
+ "kvwrap-core",
+ "kvwrap-proto",
+ "prost",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tonic",
+ "tracing",
+]
+
+[[package]]
+name = "kvwrap-proto"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "serde",
+ "tonic",
+ "tonic-prost",
+ "tonic-prost-build",
+]
 
 [[package]]
 name = "lazy_static"

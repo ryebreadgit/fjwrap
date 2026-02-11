@@ -1,6 +1,6 @@
 use crate::routing::ShardRouter;
-use fjwrap_core::{Error, KvStore};
-use fjwrap_proto::{
+use kvwrap_core::{Error, KvStore};
+use kvwrap_proto::{
     DeleteRequest, DeleteResponse, GetRequest, GetResponse, NodeId, SetRequest, SetResponse,
     ShardId, kv_service_client::KvServiceClient, kv_service_server::KvService,
 };
@@ -9,7 +9,7 @@ use tokio::sync::RwLock;
 use tonic::transport::Channel;
 use tonic::{Request, Response, Status};
 
-const PROXIED_HEADER: &str = "x-fjwrap-proxied";
+const PROXIED_HEADER: &str = "x-kvwrap-proxied";
 pub struct KvServiceImpl<S, R> {
     node_id: NodeId,
     store: Arc<S>,

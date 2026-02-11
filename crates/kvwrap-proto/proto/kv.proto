@@ -1,5 +1,5 @@
 syntax = "proto3";
-package fjwrappb;
+package kvwrappb;
 
 /// Service for key-value store operations.
 service KvService {

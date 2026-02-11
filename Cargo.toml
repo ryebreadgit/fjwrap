@@ -1,12 +1,12 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/fjwrap",
-    "crates/fjwrap-bin",
-    "crates/fjwrap-core",
-    "crates/fjwrap-distributed",
-    "crates/fjwrap-client",
-    "crates/fjwrap-proto"
+    "crates/kvwrap",
+    "crates/kvwrap-bin",
+    "crates/kvwrap-core",
+    "crates/kvwrap-distributed",
+    "crates/kvwrap-client",
+    "crates/kvwrap-proto"
 ]
 
 [workspace.package]
@@ -14,13 +14,13 @@ version = "0.1.0"
 edition = "2024"
 authors = ["RyeBread <info@rye.moe>"]
 license = "MIT"
-repository = "https://github.com/ryebreadgit/fjwrap"
+repository = "https://github.com/ryebreadgit/kvwrap"
 
 [workspace.dependencies]
 # Internal
-fjwrap-core = { path = "crates/fjwrap-core" }
-fjwrap-distributed = { path = "crates/fjwrap-distributed" }
-fjwrap-client = { path = "crates/fjwrap-client" }
+kvwrap-core = { path = "crates/kvwrap-core" }
+kvwrap-distributed = { path = "crates/kvwrap-distributed" }
+kvwrap-client = { path = "crates/kvwrap-client" }
 
 # External
 fjall = "3"

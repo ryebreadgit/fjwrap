@@ -16,7 +16,7 @@ devenv.local.yaml
 
 # Ignore default data path & router settings
 
-.fjwrap_data/
+.kvwrap_data/
 router_settings.json
 
 # Ignore IDE files

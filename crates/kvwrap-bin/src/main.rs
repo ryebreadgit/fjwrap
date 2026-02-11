@@ -1,34 +1,34 @@
 use anyhow::Error;
 use clap::Parser;
-use fjwrap::{
+use fracturedjson::Formatter;
+use kvwrap::{
     ClusterConfig, KeyRange, LocalConfig, LocalStore, NodeAddress, NodeId, NodeInfo, ShardConfig,
     ShardId, ShardStatus, StaticRouter, run_server,
 };
-use fracturedjson::Formatter;
 use std::{fs, net::SocketAddr, sync::Arc};
 
 #[derive(Parser)]
 struct Args {
-    #[arg(long, default_value = "0.0.0.0:50051", env = "FJWRAP_LISTEN_ADDR")]
+    #[arg(long, default_value = "0.0.0.0:50051", env = "KVWRAP_LISTEN_ADDR")]
     listen: SocketAddr,
 
-    #[arg(long, default_value = "0", env = "FJWRAP_NODE_ID")]
+    #[arg(long, default_value = "0", env = "KVWRAP_NODE_ID")]
     node_id: u64,
 
-    #[arg(long, default_value = ".fjwrap_data", env = "FJWRAP_DATA_PATH")]
+    #[arg(long, default_value = ".kvwrap_data", env = "KVWRAP_DATA_PATH")]
     data_path: String,
 
-    #[arg(long, default_value = "67108864", env = "FJWRAP_CACHE_SIZE")] // 64 MiB
+    #[arg(long, default_value = "67108864", env = "KVWRAP_CACHE_SIZE")] // 64 MiB
     cache_size: u64,
 
     #[arg(
         long,
         default_value = "./router_settings.json",
-        env = "FJWRAP_ROUTER_CONFIG_PATH"
+        env = "kvwrap_ROUTER_CONFIG_PATH"
     )]
     router_config_path: String,
 
-    #[arg(long, default_value = "false", env = "FJWRAP_VERBOSE")]
+    #[arg(long, default_value = "false", env = "kvwrap_VERBOSE")]
     verbose: bool,
 }
 

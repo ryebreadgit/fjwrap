@@ -1,5 +1,5 @@
 use crate::routing::traits::{ClusterConfigExt, KeyRangeExt};
-pub use fjwrap_proto::{
+pub use kvwrap_proto::{
     ClusterConfig, KeyRange, NodeAddress, NodeId, NodeInfo, ShardConfig, ShardId, ShardStatus,
 };
 

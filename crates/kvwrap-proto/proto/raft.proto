@@ -1,5 +1,6 @@
 syntax = "proto3";
-package fjwrappb;
+import "cluster.proto";
+package kvwrappb;
 
 // Service for Raft consensus operations.
 service RaftService {

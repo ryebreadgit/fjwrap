@@ -1,12 +1,12 @@
 [package]
-name = "fjwrap-distributed"
+name = "kvwrap-distributed"
 version.workspace = true
 edition.workspace = true
-description = "Distributed capabilities for fjwrap"
+description = "Distributed capabilities for kvwrap"
 
 [dependencies]
-fjwrap-core = { path = "../fjwrap-core" }
-fjwrap-proto = { path = "../fjwrap-proto" }
+kvwrap-core = { path = "../kvwrap-core" }
+kvwrap-proto = { path = "../kvwrap-proto" }
 tonic = { workspace = true }
 prost = { workspace = true }
 tokio = { workspace = true }

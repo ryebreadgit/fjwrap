@@ -1,12 +1,12 @@
 [package]
-name = "fjwrap-client"
+name = "kvwrap-client"
 version.workspace = true
 edition.workspace = true
-description = "Lightweight client for fjwrap clusters"
+description = "Lightweight client for kvwrap clusters"
 
 [dependencies]
-fjwrap-core = { path = "../fjwrap-core" }
-fjwrap-proto = { path = "../fjwrap-proto" }
+kvwrap-core = { path = "../kvwrap-core" }
+kvwrap-proto = { path = "../kvwrap-proto" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

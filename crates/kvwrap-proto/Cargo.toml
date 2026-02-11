@@ -1,8 +1,8 @@
 [package]
-name = "fjwrap-proto"
+name = "kvwrap-proto"
 version.workspace = true
 edition.workspace = true
-description = "Protobuf definitiaons for fjwrap"
+description = "Protobuf definitiaons for kvwrap"
 
 [dependencies]
 tonic = { workspace = true }

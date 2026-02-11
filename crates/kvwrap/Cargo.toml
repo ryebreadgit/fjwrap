@@ -1,0 +1,18 @@
+[package]
+name = "kvwrap"
+version.workspace = true
+edition.workspace = true
+description = "Flexible kvstore wrapper with optional distributed capabilities"
+
+[features]
+default = []
+
+# Convenience presets
+distributed = ["dep:kvwrap-distributed"]
+client = ["dep:kvwrap-client"]
+full = ["distributed", "client"]
+
+[dependencies]
+kvwrap-core = { workspace = true }
+kvwrap-distributed = { workspace = true, optional = true }
+kvwrap-client = { workspace = true, optional = true }

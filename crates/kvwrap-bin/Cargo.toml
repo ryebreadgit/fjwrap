@@ -1,15 +1,15 @@
 [package]
-name = "fjwrap-bin"
+name = "kvwrap-bin"
 version.workspace = true
 edition.workspace = true
-description = "Fjwrap binary runner"
+description = "kvwrap binary runner"
 
 [[bin]]
-name = "fjwrap"
+name = "kvwrap"
 path = "src/main.rs"
 
 [dependencies]
-fjwrap = { path = "../fjwrap", features = ["distributed"] }
+kvwrap = { path = "../kvwrap", features = ["distributed"] }
 clap = { workspace = true }
 tokio = { workspace = true }
 anyhow = { workspace = true }
