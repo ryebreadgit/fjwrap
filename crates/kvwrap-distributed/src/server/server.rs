@@ -81,7 +81,10 @@ impl<S, R> KvServiceImpl<S, R> {
 fn core_error_to_status(err: Error) -> Status {
     match err {
         Error::KeyNotFound => Status::not_found("key not found"),
-        Error::Storage(e) => Status::internal(format!("storage error: {}", e)),
+        #[cfg(feature = "fjall")]
+        Error::Fjall(e) => Status::internal(format!("storage error: {}", e)),
+        #[cfg(feature = "sled")]
+        Error::Sled(e) => Status::internal(format!("storage error: {}", e)),
         Error::Io(e) => Status::internal(format!("io error: {}", e)),
         Error::SerdeJson(e) => Status::internal(format!("serialization error: {}", e)),
         Error::Network(e) => Status::internal(format!("network error: {}", e)),

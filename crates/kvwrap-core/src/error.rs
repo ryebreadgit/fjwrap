@@ -5,8 +5,13 @@ pub enum Error {
     #[error("Key not found")]
     KeyNotFound,
 
-    #[error("Storage error: {0}")]
-    Storage(#[from] fjall::Error),
+    #[cfg(feature = "fjall")]
+    #[error("Fjall storage error: {0}")]
+    Fjall(#[from] fjall::Error),
+
+    #[cfg(feature = "sled")]
+    #[error("Sled storage error: {0}")]
+    Sled(#[from] sled::Error),
 
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),

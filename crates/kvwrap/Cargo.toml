@@ -5,9 +5,9 @@ edition.workspace = true
 description = "Flexible kvstore wrapper with optional distributed capabilities"
 
 [features]
-default = []
-
-# Convenience presets
+default = ["fjall"]
+fjall = ["kvwrap-core/fjall", "kvwrap-distributed?/fjall"]
+sled = ["kvwrap-core/sled", "kvwrap-distributed?/sled"]
 distributed = ["dep:kvwrap-distributed"]
 client = ["dep:kvwrap-client"]
 full = ["distributed", "client"]

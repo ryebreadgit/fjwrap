@@ -5,8 +5,14 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 
+[features]
+default = ["fjall"]
+fjall = ["dep:fjall"]
+sled = ["dep:sled"]
+
 [dependencies]
-fjall = { workspace = true }
+fjall = { workspace = true, optional = true }
+sled = { workspace = true, optional = true }
 thiserror = { workspace = true }
 serde = { workspace = true }
 async-trait = { workspace = true }

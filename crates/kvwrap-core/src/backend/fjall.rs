@@ -10,12 +10,12 @@ use std::{
 };
 
 #[derive(Clone)]
-pub struct LocalStore {
+pub struct FjallStore {
     db: Database,
     keyspaces: Arc<RwLock<HashMap<Vec<u8>, Keyspace>>>,
 }
 
-impl LocalStore {
+impl FjallStore {
     pub fn new(config: LocalConfig) -> Result<Self> {
         let path = Path::new(&config.path);
         if !path.exists() {
@@ -56,7 +56,7 @@ impl LocalStore {
 }
 
 #[async_trait]
-impl KvStore for LocalStore {
+impl KvStore for FjallStore {
     async fn get(&self, partition: &[u8], key: &[u8]) -> Result<Option<Vec<u8>>> {
         let keyspace = self.get_or_create_keyspace(partition)?;
         let key = key.to_vec();
@@ -64,7 +64,7 @@ impl KvStore for LocalStore {
             keyspace
                 .get(&key)
                 .map(|op| op.map(|v| v.to_vec()))
-                .map_err(Error::Storage)
+                .map_err(Error::Fjall)
         })
         .await
     }
@@ -72,11 +72,11 @@ impl KvStore for LocalStore {
         let keyspace = self.get_or_create_keyspace(partition)?;
         let key = key.to_vec();
         let value = value.to_vec();
-        blocking::unblock(move || keyspace.insert(&key, &value).map_err(Error::Storage)).await
+        blocking::unblock(move || keyspace.insert(&key, &value).map_err(Error::Fjall)).await
     }
     async fn delete(&self, partition: &[u8], key: &[u8]) -> Result<()> {
         let keyspace = self.get_or_create_keyspace(partition)?;
         let key = key.to_vec();
-        blocking::unblock(move || keyspace.remove(&key).map_err(Error::Storage)).await
+        blocking::unblock(move || keyspace.remove(&key).map_err(Error::Fjall)).await
     }
 }
