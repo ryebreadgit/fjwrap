@@ -9,7 +9,7 @@ name = "kvwrap"
 path = "src/main.rs"
 
 [dependencies]
-kvwrap = { path = "../kvwrap", features = ["distributed"] }
+kvwrap = { path = "../kvwrap", features = ["distributed", "sled"] }
 clap = { workspace = true }
 tokio = { workspace = true }
 anyhow = { workspace = true }
