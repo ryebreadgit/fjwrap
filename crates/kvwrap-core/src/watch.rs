@@ -1,6 +1,4 @@
-use crate::{KvStore, Result};
 use async_channel::{Receiver, Sender};
-use async_trait::async_trait;
 use std::sync::{Arc, Mutex};
 
 #[derive(Debug, Clone)]

@@ -298,7 +298,7 @@ where
         &self,
         request: Request<WatchRequest>,
     ) -> Result<Response<Self::WatchStream>, Status> {
-        let is_proxied = Self::is_proxied_request(&request);
+        let _is_proxied = Self::is_proxied_request(&request);
         let req = request.into_inner();
 
         tracing::debug!(

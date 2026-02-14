@@ -1,6 +1,6 @@
 use crate::routing::{
     error::RouteError,
-    traits::{ClusterConfigExt, KeyRangeExt, RouteResult, ShardRouter},
+    traits::{ClusterConfigExt, RouteResult, ShardRouter},
     types::{ClusterConfig, NodeId, NodeInfo, ShardId, ShardStatus},
 };
 use prost::Message;

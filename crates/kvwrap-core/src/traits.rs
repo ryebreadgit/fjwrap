@@ -1,5 +1,5 @@
 use crate::{Error, Result, WatchEvent};
-use async_channel::{Receiver, Sender};
+use async_channel::Receiver;
 use async_trait::async_trait;
 use serde::{Serialize, de::DeserializeOwned};
 use std::sync::Arc;
