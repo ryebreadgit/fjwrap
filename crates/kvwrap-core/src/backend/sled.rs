@@ -1,6 +1,6 @@
 use crate::{Error, KvStore, LocalConfig, Result, WatchEvent, WatchRegistry};
+use async_channel::Receiver;
 use async_trait::async_trait;
-use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use std::{
     collections::HashMap,
     fs,
@@ -30,32 +30,32 @@ impl SledStore {
         Ok(Self {
             db,
             trees: Arc::new(RwLock::new(HashMap::new())),
+            watchers: WatchRegistry::default(),
         })
     }
 
-    fn get_or_create_tree(&self, name: &[u8]) -> Result<sled::Tree> {
+    fn get_or_create_tree(&self, name: &str) -> Result<sled::Tree> {
         {
             let cache = self.trees.read().unwrap();
-            if let Some(tree) = cache.get(name) {
+            if let Some(tree) = cache.get(name.as_bytes()) {
                 return Ok(tree.clone());
             }
         }
 
         let mut cache = self.trees.write().unwrap();
-        if let Some(tree) = cache.get(name) {
+        if let Some(tree) = cache.get(name.as_bytes()) {
             return Ok(tree.clone());
         }
 
-        let name_str = URL_SAFE_NO_PAD.encode(name);
-        let tree = self.db.open_tree(name_str.as_bytes())?;
-        cache.insert(name.to_vec(), tree.clone());
+        let tree = self.db.open_tree(name.as_bytes())?;
+        cache.insert(name.as_bytes().to_vec(), tree.clone());
         Ok(tree)
     }
 }
 
 #[async_trait]
 impl KvStore for SledStore {
-    async fn get(&self, partition: &[u8], key: &[u8]) -> Result<Option<Vec<u8>>> {
+    async fn get(&self, partition: &str, key: &[u8]) -> Result<Option<Vec<u8>>> {
         let tree = self.get_or_create_tree(partition)?;
         let key = key.to_vec();
         blocking::unblock(move || {
@@ -66,7 +66,7 @@ impl KvStore for SledStore {
         .await
     }
 
-    async fn set(&self, partition: &[u8], key: &[u8], value: &[u8]) -> Result<()> {
+    async fn set(&self, partition: &str, key: &[u8], value: &[u8]) -> Result<()> {
         let tree = self.get_or_create_tree(partition)?;
         let key = key.to_vec();
         let value = value.to_vec();
@@ -79,22 +79,30 @@ impl KvStore for SledStore {
         })
         .await?;
         self.watchers.notify(&WatchEvent::Set {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             key: key_for_notify,
             value: value_for_notify,
         });
         Ok(())
     }
 
-    async fn delete(&self, partition: &[u8], key: &[u8]) -> Result<()> {
+    async fn delete(&self, partition: &str, key: &[u8]) -> Result<()> {
         let tree = self.get_or_create_tree(partition)?;
         let key = key.to_vec();
         let key_for_notify = key.clone();
         blocking::unblock(move || tree.remove(&key).map(|_| ()).map_err(Error::Sled)).await?;
         self.watchers.notify(&WatchEvent::Delete {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             key: key_for_notify,
         });
         Ok(())
+    }
+
+    fn watch_key(&self, partition: &str, key: &[u8], buffer: usize) -> Receiver<WatchEvent> {
+        self.watchers.subscribe_key(partition, key, buffer)
+    }
+
+    fn watch_prefix(&self, partition: &str, prefix: &[u8], buffer: usize) -> Receiver<WatchEvent> {
+        self.watchers.subscribe_prefix(partition, prefix, buffer)
     }
 }

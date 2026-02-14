@@ -4,18 +4,18 @@ use std::sync::{Arc, Mutex};
 #[derive(Debug, Clone)]
 pub enum WatchEvent {
     Set {
-        partition: Vec<u8>,
+        partition: String,
         key: Vec<u8>,
         value: Vec<u8>,
     },
     Delete {
-        partition: Vec<u8>,
+        partition: String,
         key: Vec<u8>,
     },
 }
 
 impl WatchEvent {
-    pub fn partition(&self) -> &[u8] {
+    pub fn partition(&self) -> &str {
         match self {
             WatchEvent::Set { partition, .. } => partition,
             WatchEvent::Delete { partition, .. } => partition,
@@ -31,7 +31,7 @@ impl WatchEvent {
 }
 
 struct WatchSubscription {
-    partition: Vec<u8>,
+    partition: String,
     matcher: KeyMatcher,
     sender: Sender<WatchEvent>,
 }
@@ -62,13 +62,13 @@ impl WatchRegistry {
 
     pub fn subscribe_key(
         &self,
-        partition: &[u8],
+        partition: &str,
         key: &[u8],
         buffer: usize,
     ) -> Receiver<WatchEvent> {
         let (tx, rx) = async_channel::bounded(buffer);
         self.subscribers.lock().unwrap().push(WatchSubscription {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             matcher: KeyMatcher::Exact(key.to_vec()),
             sender: tx,
         });
@@ -77,13 +77,13 @@ impl WatchRegistry {
 
     pub fn subscribe_prefix(
         &self,
-        partition: &[u8],
+        partition: &str,
         prefix: &[u8],
         buffer: usize,
     ) -> Receiver<WatchEvent> {
         let (tx, rx) = async_channel::bounded(buffer);
         self.subscribers.lock().unwrap().push(WatchSubscription {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             matcher: KeyMatcher::Prefix(prefix.to_vec()),
             sender: tx,
         });

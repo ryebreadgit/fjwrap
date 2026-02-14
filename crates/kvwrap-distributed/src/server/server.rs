@@ -104,7 +104,7 @@ where
         let req = request.into_inner();
 
         tracing::debug!(
-            partition = %String::from_utf8_lossy(&req.partition),
+            partition = %req.partition,
             key_len = req.key.len(),
             proxied = is_proxied,
             "get request"
@@ -169,7 +169,7 @@ where
         let req = request.into_inner();
 
         tracing::debug!(
-            partition = %String::from_utf8_lossy(&req.partition),
+            partition = &req.partition,
             key_len = req.key.len(),
             value_len = req.value.len(),
             proxied = is_proxied,
@@ -237,7 +237,7 @@ where
         let req = request.into_inner();
 
         tracing::debug!(
-            partition = %String::from_utf8_lossy(&req.partition),
+            partition = &req.partition,
             key_len = req.key.len(),
             proxied = is_proxied,
             "delete request"
@@ -302,7 +302,7 @@ where
         let req = request.into_inner();
 
         tracing::debug!(
-            partition = %String::from_utf8_lossy(&req.partition),
+            partition = &req.partition,
             key_or_prefix_len = req.key_or_prefix.len(),
             is_prefix = req.is_prefix,
             "watch request"

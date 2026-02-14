@@ -66,7 +66,7 @@ impl RemoteStore {
 
     fn start_watch(
         &self,
-        partition: &[u8],
+        partition: &str,
         key_or_prefix: &[u8],
         is_prefix: bool,
         buffer: usize,
@@ -74,7 +74,7 @@ impl RemoteStore {
         let (tx, rx) = async_channel::bounded(buffer);
         let mut client = self.client.clone();
         let request = WatchRequest {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             key_or_prefix: key_or_prefix.to_vec(),
             is_prefix,
         };
@@ -125,9 +125,9 @@ impl RemoteStore {
 
 #[async_trait]
 impl KvStore for RemoteStore {
-    async fn get(&self, partition: &[u8], key: &[u8]) -> Result<Option<Vec<u8>>> {
+    async fn get(&self, partition: &str, key: &[u8]) -> Result<Option<Vec<u8>>> {
         let request = GetRequest {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             key: key.to_vec(),
         };
         let mut client = self.client.clone();
@@ -139,9 +139,9 @@ impl KvStore for RemoteStore {
         Ok(response.into_inner().value)
     }
 
-    async fn set(&self, partition: &[u8], key: &[u8], value: &[u8]) -> Result<()> {
+    async fn set(&self, partition: &str, key: &[u8], value: &[u8]) -> Result<()> {
         let request = SetRequest {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             key: key.to_vec(),
             value: value.to_vec(),
         };
@@ -154,9 +154,9 @@ impl KvStore for RemoteStore {
         Ok(())
     }
 
-    async fn delete(&self, partition: &[u8], key: &[u8]) -> Result<()> {
+    async fn delete(&self, partition: &str, key: &[u8]) -> Result<()> {
         let request = DeleteRequest {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             key: key.to_vec(),
         };
         let mut client = self.client.clone();
@@ -168,11 +168,11 @@ impl KvStore for RemoteStore {
         Ok(())
     }
 
-    fn watch_key(&self, partition: &[u8], key: &[u8], buffer: usize) -> Receiver<WatchEvent> {
+    fn watch_key(&self, partition: &str, key: &[u8], buffer: usize) -> Receiver<WatchEvent> {
         self.start_watch(partition, key, false, buffer)
     }
 
-    fn watch_prefix(&self, partition: &[u8], prefix: &[u8], buffer: usize) -> Receiver<WatchEvent> {
+    fn watch_prefix(&self, partition: &str, prefix: &[u8], buffer: usize) -> Receiver<WatchEvent> {
         self.start_watch(partition, prefix, true, buffer)
     }
 }

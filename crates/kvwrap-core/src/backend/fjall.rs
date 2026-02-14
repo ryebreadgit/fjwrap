@@ -1,7 +1,6 @@
 use crate::{Error, KvStore, LocalConfig, Result, WatchEvent, WatchRegistry};
 use async_channel::Receiver;
 use async_trait::async_trait;
-use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use fjall::{Database, Keyspace, KeyspaceCreateOptions};
 use std::{
     collections::HashMap,
@@ -13,7 +12,7 @@ use std::{
 #[derive(Clone)]
 pub struct FjallStore {
     db: Database,
-    keyspaces: Arc<RwLock<HashMap<Vec<u8>, Keyspace>>>,
+    keyspaces: Arc<RwLock<HashMap<String, Keyspace>>>,
     watchers: WatchRegistry,
 }
 
@@ -35,7 +34,7 @@ impl FjallStore {
         })
     }
 
-    fn get_or_create_keyspace(&self, name: &[u8]) -> Result<Keyspace> {
+    fn get_or_create_keyspace(&self, name: &str) -> Result<Keyspace> {
         {
             let cache = self.keyspaces.read().unwrap();
             if let Some(ks) = cache.get(name) {
@@ -49,18 +48,17 @@ impl FjallStore {
             return Ok(ks.clone());
         }
 
-        let name_str = URL_SAFE_NO_PAD.encode(name); // Encode to make it keyspace name safe
         let ks = self
             .db
-            .keyspace(&name_str, || KeyspaceCreateOptions::default())?;
-        cache.insert(name.to_vec(), ks.clone());
+            .keyspace(name, || KeyspaceCreateOptions::default())?;
+        cache.insert(name.to_string(), ks.clone());
         Ok(ks)
     }
 }
 
 #[async_trait]
 impl KvStore for FjallStore {
-    async fn get(&self, partition: &[u8], key: &[u8]) -> Result<Option<Vec<u8>>> {
+    async fn get(&self, partition: &str, key: &[u8]) -> Result<Option<Vec<u8>>> {
         let keyspace = self.get_or_create_keyspace(partition)?;
         let key = key.to_vec();
         blocking::unblock(move || {
@@ -71,7 +69,7 @@ impl KvStore for FjallStore {
         })
         .await
     }
-    async fn set(&self, partition: &[u8], key: &[u8], value: &[u8]) -> Result<()> {
+    async fn set(&self, partition: &str, key: &[u8], value: &[u8]) -> Result<()> {
         let keyspace = self.get_or_create_keyspace(partition)?;
         let key = key.to_vec();
         let value = value.to_vec();
@@ -85,29 +83,29 @@ impl KvStore for FjallStore {
         .await?;
 
         self.watchers.notify(&WatchEvent::Set {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             key: key_for_notify,
             value: value_for_notify,
         });
         Ok(())
     }
-    async fn delete(&self, partition: &[u8], key: &[u8]) -> Result<()> {
+    async fn delete(&self, partition: &str, key: &[u8]) -> Result<()> {
         let keyspace = self.get_or_create_keyspace(partition)?;
         let key = key.to_vec();
         let key_for_notify = key.clone();
         blocking::unblock(move || keyspace.remove(&key).map_err(Error::Fjall)).await?;
         self.watchers.notify(&WatchEvent::Delete {
-            partition: partition.to_vec(),
+            partition: partition.to_string(),
             key: key_for_notify,
         });
         Ok(())
     }
 
-    fn watch_key(&self, partition: &[u8], key: &[u8], buffer: usize) -> Receiver<WatchEvent> {
+    fn watch_key(&self, partition: &str, key: &[u8], buffer: usize) -> Receiver<WatchEvent> {
         self.watchers.subscribe_key(partition, key, buffer)
     }
 
-    fn watch_prefix(&self, partition: &[u8], prefix: &[u8], buffer: usize) -> Receiver<WatchEvent> {
+    fn watch_prefix(&self, partition: &str, prefix: &[u8], buffer: usize) -> Receiver<WatchEvent> {
         self.watchers.subscribe_prefix(partition, prefix, buffer)
     }
 }

@@ -14,8 +14,8 @@ service KvService {
 }
 
 message GetRequest {
-  bytes partition = 1;
-  bytes key       = 2;
+  string partition = 1;
+  bytes  key       = 2;
 }
 
 message GetResponse {
@@ -23,24 +23,24 @@ message GetResponse {
 }
 
 message SetRequest {
-  bytes partition = 1;
-  bytes key       = 2;
-  bytes value     = 3;
+  string partition = 1;
+  bytes  key       = 2;
+  bytes  value     = 3;
 }
 
 message SetResponse {}
 
 message DeleteRequest {
-  bytes partition = 1;
-  bytes key       = 2;
+  string partition = 1;
+  bytes  key       = 2;
 }
 
 message DeleteResponse {}
 
 message WatchRequest {
-  bytes partition     = 1;
-  bytes key_or_prefix = 2;
-  bool  is_prefix     = 3;
+  string partition     = 1;
+  bytes  key_or_prefix = 2;
+  bool   is_prefix     = 3;
 }
 
 message WatchEventMessage {
@@ -49,7 +49,7 @@ message WatchEventMessage {
     DELETE = 1;
   }
   EventType event_type = 1;
-  bytes     partition  = 2;
+  string    partition  = 2;
   bytes     key        = 3;
   bytes     value      = 4;
 }

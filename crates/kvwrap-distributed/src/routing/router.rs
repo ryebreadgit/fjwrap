@@ -35,7 +35,7 @@ impl StaticRouter {
 }
 
 impl ShardRouter for StaticRouter {
-    fn route(&self, partition: &[u8], key: &[u8]) -> RouteResult<ShardId> {
+    fn route(&self, partition: &str, key: &[u8]) -> RouteResult<ShardId> {
         let shard_key = self.shard_key(partition, key);
 
         for shard in &self.config.shards {

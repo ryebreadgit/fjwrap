@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 async fn get_json_impl<S: KvStore + ?Sized, T>(
     store: &S,
-    partition: &[u8],
+    partition: &str,
     key: &[u8],
 ) -> Result<Option<T>>
 where
@@ -22,7 +22,7 @@ where
 
 async fn set_json_impl<S: KvStore + ?Sized, T>(
     store: &S,
-    partition: &[u8],
+    partition: &str,
     key: &[u8],
     value: &T,
 ) -> Result<()>
@@ -35,13 +35,13 @@ where
 
 #[async_trait]
 pub trait KvStore: Send + Sync {
-    async fn get(&self, partition: &[u8], key: &[u8]) -> Result<Option<Vec<u8>>>;
-    async fn set(&self, partition: &[u8], key: &[u8], value: &[u8]) -> Result<()>;
-    async fn delete(&self, partition: &[u8], key: &[u8]) -> Result<()>;
-    fn watch_key(&self, partition: &[u8], key: &[u8], buffer: usize) -> Receiver<WatchEvent>;
-    fn watch_prefix(&self, partition: &[u8], prefix: &[u8], buffer: usize) -> Receiver<WatchEvent>;
+    async fn get(&self, partition: &str, key: &[u8]) -> Result<Option<Vec<u8>>>;
+    async fn set(&self, partition: &str, key: &[u8], value: &[u8]) -> Result<()>;
+    async fn delete(&self, partition: &str, key: &[u8]) -> Result<()>;
+    fn watch_key(&self, partition: &str, key: &[u8], buffer: usize) -> Receiver<WatchEvent>;
+    fn watch_prefix(&self, partition: &str, prefix: &[u8], buffer: usize) -> Receiver<WatchEvent>;
 
-    async fn get_json<T>(&self, partition: &[u8], key: &[u8]) -> Result<Option<T>>
+    async fn get_json<T>(&self, partition: &str, key: &[u8]) -> Result<Option<T>>
     where
         T: DeserializeOwned + Send,
         Self: Sized,
@@ -49,7 +49,7 @@ pub trait KvStore: Send + Sync {
         get_json_impl(self, partition, key).await
     }
 
-    async fn set_json<T>(&self, partition: &[u8], key: &[u8], value: &T) -> Result<()>
+    async fn set_json<T>(&self, partition: &str, key: &[u8], value: &T) -> Result<()>
     where
         T: Serialize + Sync,
         Self: Sized,
@@ -60,34 +60,34 @@ pub trait KvStore: Send + Sync {
 
 #[async_trait]
 impl KvStore for Arc<dyn KvStore> {
-    async fn get(&self, partition: &[u8], key: &[u8]) -> Result<Option<Vec<u8>>> {
+    async fn get(&self, partition: &str, key: &[u8]) -> Result<Option<Vec<u8>>> {
         (**self).get(partition, key).await
     }
 
-    async fn set(&self, partition: &[u8], key: &[u8], value: &[u8]) -> Result<()> {
+    async fn set(&self, partition: &str, key: &[u8], value: &[u8]) -> Result<()> {
         (**self).set(partition, key, value).await
     }
 
-    async fn delete(&self, partition: &[u8], key: &[u8]) -> Result<()> {
+    async fn delete(&self, partition: &str, key: &[u8]) -> Result<()> {
         (**self).delete(partition, key).await
     }
 
-    fn watch_key(&self, partition: &[u8], key: &[u8], buffer: usize) -> Receiver<WatchEvent> {
+    fn watch_key(&self, partition: &str, key: &[u8], buffer: usize) -> Receiver<WatchEvent> {
         (**self).watch_key(partition, key, buffer)
     }
 
-    fn watch_prefix(&self, partition: &[u8], prefix: &[u8], buffer: usize) -> Receiver<WatchEvent> {
+    fn watch_prefix(&self, partition: &str, prefix: &[u8], buffer: usize) -> Receiver<WatchEvent> {
         (**self).watch_prefix(partition, prefix, buffer)
     }
 
-    async fn get_json<T>(&self, partition: &[u8], key: &[u8]) -> Result<Option<T>>
+    async fn get_json<T>(&self, partition: &str, key: &[u8]) -> Result<Option<T>>
     where
         T: DeserializeOwned + Send,
     {
         get_json_impl(self.as_ref(), partition, key).await
     }
 
-    async fn set_json<T>(&self, partition: &[u8], key: &[u8], value: &T) -> Result<()>
+    async fn set_json<T>(&self, partition: &str, key: &[u8], value: &T) -> Result<()>
     where
         T: Serialize + Sync,
     {
