@@ -79,17 +79,20 @@ impl RemoteStore {
             is_prefix,
         };
 
-        tokio::spawn(async move {
-            let stream = match client.watch(request).await {
-                Ok(response) => response.into_inner(),
-                Err(e) => {
-                    tracing::warn!(error = %e, "watch stream failed to start");
-                    return;
-                }
-            };
+        blocking::unblock(move || {
+            futures_lite::future::block_on(async move {
+                let stream = match client.watch(request).compat().await {
+                    Ok(response) => response.into_inner(),
+                    Err(e) => {
+                        tracing::warn!(error = %e, "watch stream failed to start");
+                        return;
+                    }
+                };
 
-            Self::run_watch_stream(stream, tx).await;
-        });
+                Self::run_watch_stream(stream, tx).await;
+            });
+        })
+        .detach();
 
         rx
     }
@@ -98,23 +101,25 @@ impl RemoteStore {
         mut stream: tonic::Streaming<kvwrap_proto::WatchEventMessage>,
         tx: async_channel::Sender<WatchEvent>,
     ) {
-        use futures_lite::StreamExt;
-
-        loop {
-            match stream.next().await {
-                Some(Ok(msg)) => {
-                    let event = proto_to_watch_event(msg);
-                    if tx.send(event).await.is_err() {
+        async {
+            loop {
+                match stream.message().await {
+                    Ok(Some(msg)) => {
+                        let event = proto_to_watch_event(msg);
+                        if tx.send(event).await.is_err() {
+                            break;
+                        }
+                    }
+                    Ok(None) => break,
+                    Err(e) => {
+                        tracing::warn!(error = %e, "watch stream error");
                         break;
                     }
                 }
-                Some(Err(e)) => {
-                    tracing::warn!(error = %e, "watch stream error");
-                    break;
-                }
-                None => break, // stream ended
             }
         }
+        .compat()
+        .await
     }
 }
 
