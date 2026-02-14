@@ -12,3 +12,6 @@ serde = { workspace = true }
 
 [build-dependencies]
 tonic-prost-build = { workspace = true }
+
+[package.metadata.cargo-machete]
+ignored = ["tonic-prost-build", "prost", "serde", "tonic-prost"]

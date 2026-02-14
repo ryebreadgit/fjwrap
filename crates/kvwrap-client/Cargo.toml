@@ -7,9 +7,6 @@ description = "Lightweight client for kvwrap clusters"
 [dependencies]
 kvwrap-core = { path = "../kvwrap-core" }
 kvwrap-proto = { path = "../kvwrap-proto" }
-serde = { workspace = true }
-serde_json = { workspace = true }
-thiserror = { workspace = true }
 async-trait = { workspace = true }
 async-compat = { workspace = true }
 tonic = { workspace = true }
